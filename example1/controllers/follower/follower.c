@@ -33,13 +33,17 @@
 // to be used as array indices
 enum { X, Y, Z };
 
-#define TIME_STEP 50
+#define TIME_STEP 10
 #define UNKNOWN 99999.99
 
 // Line following PID
-#define KP 0.25
+#define KP 0.5 // 0.25
 #define KI 0.006
-#define KD 2
+#define KD 2 //2
+
+#define SPEED 19.3
+//FILE *fp;
+//fp = fopen ("file.txt", "w+");
 
 bool PID_need_reset = false;
 
@@ -48,9 +52,9 @@ bool PID_need_reset = false;
 
 // enabe various 'features'
 bool enable_collision_avoidance = false;
-bool enable_display = false;
+bool enable_display = true;
 bool has_gps = false;
-bool has_camera = false;
+bool has_camera = true;
 
 // camera
 WbDeviceTag camera;
@@ -283,7 +287,11 @@ double applyPID(double yellow_line_angle) {
 }
 
 int main(int argc, char **argv) {
+  // fprintf(fp,"[FOLLOWER]");
+  // fflush(fp);
+
   wbu_driver_init();
+  printf("[FOLLOWER]");
 
   // check if there is a SICK and a display
   int j = 0;
@@ -299,6 +307,7 @@ int main(int argc, char **argv) {
     else if (strcmp(name, "camera") == 0)
       has_camera = true;
   }
+  printf("[FOLLOWER]");
 
   // camera device
   if (has_camera) {
@@ -309,6 +318,7 @@ int main(int argc, char **argv) {
     camera_height = wb_camera_get_height(camera);
     camera_fov = wb_camera_get_fov(camera);
   }
+  printf("[FOLLOWER]");
 
   // SICK sensor
   if (enable_collision_avoidance) {
@@ -318,12 +328,14 @@ int main(int argc, char **argv) {
     sick_range = wb_lidar_get_max_range(sick);
     sick_fov = wb_lidar_get_fov(sick);
   }
+  printf("[FOLLOWER]");
 
   // initialize gps
   if (has_gps) {
     gps = wb_robot_get_device("gps");
     wb_gps_enable(gps, TIME_STEP);
   }
+  printf("[FOLLOWER]");
 
   // initialize display (speedometer)
   if (enable_display) {
@@ -333,7 +345,7 @@ int main(int argc, char **argv) {
 
   // start engine
   if (has_camera)
-    set_speed(40.0);  // km/h
+    set_speed(SPEED);  // km/h
   wbu_driver_set_hazard_flashers(true);
   wbu_driver_set_dipped_beams(true);
   wbu_driver_set_antifog_lights(true);
@@ -342,6 +354,7 @@ int main(int argc, char **argv) {
   // main loop
   while (wbu_driver_step() != -1) {
     static int i = 0;
+    printf("[FOLLOWER]");
 
     // updates sensors only every TIME_STEP milliseconds
     if (i % (int)(TIME_STEP / wb_robot_get_basic_time_step()) == 0) {
@@ -369,15 +382,16 @@ int main(int argc, char **argv) {
       // printf("distance_to_lead: %lf\n", distance_to_lead);
 
       if (autodrive && has_camera) {
-        set_speed(40.0);
+        set_speed(SPEED);
+        printf("[FOLLOWER]");
         double orientation_to_lead = filter_angle(process_camera_image(camera_image));
         if (orientation_to_lead != UNKNOWN) {
           if (distance_to_lead != UNKNOWN) {
             if (distance_to_lead > 12.5) {
-              set_speed(45.0);
+              set_speed(SPEED+2);
               wbu_driver_set_brake_intensity(0.0);
-            } else if (distance_to_lead < 7.5) {
-              wbu_driver_set_brake_intensity(1.0);
+            } else if (distance_to_lead < 9.0) { // 7.5
+              wbu_driver_set_brake_intensity(0.5); // was 1.0
             }
           }
           set_steering_angle(applyPID(orientation_to_lead));

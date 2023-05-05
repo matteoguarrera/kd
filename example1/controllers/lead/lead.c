@@ -317,6 +317,7 @@ double applyPID(double yellow_line_angle) {
 
 int main(int argc, char **argv) {
   wbu_driver_init();
+  printf("[LEAD]");
 
   // check if there is a SICK and a display
   int j = 0;
@@ -365,21 +366,22 @@ int main(int argc, char **argv) {
 
   // start engine
   if (has_camera)
-    set_speed(40.0);  // km/h
+    set_speed(20.0);  // km/h
   wbu_driver_set_hazard_flashers(true);
   wbu_driver_set_dipped_beams(true);
   wbu_driver_set_antifog_lights(true);
   wbu_driver_set_wiper_mode(SLOW);
 
-  print_help();
 
   // allow to switch to manual control
-  wb_keyboard_enable(TIME_STEP);
+  // print_help();
+  // wb_keyboard_enable(TIME_STEP); // No user input
 
   // main loop
   while (wbu_driver_step() != -1) {
     // get user input
-    check_keyboard();
+    // check_keyboard(); // No user input
+    printf("[LEAD]");
     static int i = 0;
 
     // updates sensors only every TIME_STEP milliseconds

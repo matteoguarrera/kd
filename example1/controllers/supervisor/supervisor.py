@@ -7,23 +7,38 @@
 
 # Problem: how can we have realistic physics for each subscenario?
 
+import subprocess
+
+cmd_str = "cd ~/Documents/kd/example1/controllers/follower/build && cmake .. && make"
+subprocess.run(cmd_str, shell=True)
+cmd_str = "cd ~/Documents/kd/example1/controllers/lead/build && cmake .. && make"
+subprocess.run(cmd_str, shell=True)
+
 try:
     from controller import Supervisor
 except ModuleNotFoundError:
     import sys
+
     sys.exit("This functionality requires webots to be installed")
 
-TIME_STEP = 32
+TIME_STEP = 10
 
-robot = Supervisor()  # create Supervisor instance
-
-# [CODE PLACEHOLDER 1]
+supervisor = Supervisor()  # create Supervisor instance
+ego = supervisor.getFromDef('FOLLOWER')
+lead = supervisor.getFromDef('LEAD')
+print(dir(ego))
+supervisor.simulationResetPhysics()
+supervisor.simulationReset()
+supervisor.getFromDef("FOLLOWER").restartController()
+supervisor.getFromDef("LEAD").restartController()
+supervisor.step(TIME_STEP)
 
 i = 0
-while robot.step(TIME_STEP) != -1:
-  # [CODE PLACEHOLDER 2]
+while supervisor.step(TIME_STEP) != -1:
 
-  i += 1
+    # if i % 10 == 1:
+    #     print(ego.getPosition())
+    i += 1
 
 print("[SUPERVISOR] Ended successfully")
 
