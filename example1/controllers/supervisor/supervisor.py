@@ -9,9 +9,9 @@
 
 import subprocess
 
-cmd_str = "cd ~/Documents/kd/example1/controllers/follower/build && cmake .. && make"
+cmd_str = "cd ~/Documents/kd/example1/controllers/follower/build &&  make"  # cmake .. &&
 subprocess.run(cmd_str, shell=True)
-cmd_str = "cd ~/Documents/kd/example1/controllers/lead/build && cmake .. && make"
+cmd_str = "cd ~/Documents/kd/example1/controllers/lead/build && make"  # cmake .. &&
 subprocess.run(cmd_str, shell=True)
 
 try:

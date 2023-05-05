@@ -466,6 +466,31 @@ int main(int argc, char **argv) {
             // steering_angle *= 0.9;
           }
         }
+        // Autodrive and camera, save images and data
+        // wb_camera_save_image(WbDeviceTag tag, const char *filename, int quality)
+
+        /* get seconds since the Epoch */
+        time_t secs = time(0);
+
+        /* convert to localtime */
+        struct tm *local = localtime(&secs);
+        char filename[200];
+
+        /* and set the string */
+        sprintf(filename, "/home/matteogu/Documents/kd/imgs/lead/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
+                                    local->tm_hour, local->tm_min, local->tm_sec, i, yellow_line_angle, obstacle_angle);
+        wb_camera_save_image(camera, filename, 100);
+
+        /* and set the string */
+        sprintf(filename, "/home/matteogu/Documents/kd/imgs/lead/seg/%02d_%02d_%02d_%05d_seg_%.4f_%.4f.jpg",
+                                    local->tm_hour, local->tm_min, local->tm_sec, i, yellow_line_angle, obstacle_angle);
+//      wb_camera_recognition_enable(camera, TIME_STEP);
+//      wb_camera_recognition_get_segmentation_image(camera);
+        wb_camera_recognition_save_segmentation_image(camera, filename, 100);
+
+
+
+
       }
 
       // update stuff
