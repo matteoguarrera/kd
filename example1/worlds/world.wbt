@@ -99,8 +99,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.16631305432067972 0.4771411558424383 0.8629462818529717 0.767783
-  position -105.6999 -150.198 36.1229
+  orientation -0.16691208212786052 0.47126496321994704 0.8660540925837396 0.7764280890505457
+  position -104.98249514129411 -150.81621535161156 36.1229
   near 1
   follow "follower"
   followSmoothness 0
@@ -581,7 +581,7 @@ CurvedRoadSegment {
 DEF LEAD BmwX5New {
   translation -54.5 -105 0.317
   rotation -7.240001997507892e-05 0.00772119763954837 0.9999701884882609 0
-  color 0 0 0
+  color 0.45098 0.823529 0.0862745
   name "lead"
   controller "lead"
   controllerArgs [
@@ -635,6 +635,7 @@ DEF LEAD BmwX5New {
 DEF FOLLOWER BmwX5New {
   translation -64.5 -105 0.317
   rotation -7.240001997507892e-05 0.00772119763954837 0.9999701884882609 0
+  color 0.12549 0.290196 0.529412
   name "follower"
   controller "follower"
   controllerArgs [
