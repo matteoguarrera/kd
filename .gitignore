@@ -1,3 +1,9 @@
+/example1/controllers/follower/build/
+/example1/controllers/lead/build/
+/example2
+/screenshots
+*.png
+
 # Prerequisites
 *.d
 
