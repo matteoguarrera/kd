@@ -396,28 +396,31 @@ int main(int argc, char **argv) {
             }
           }
           set_steering_angle(applyPID(orientation_to_lead));
+
+          time_t secs = time(0);
+
+            /* convert to localtime */
+          struct tm *local = localtime(&secs);
+          char filename[200];
+
+            /* and set the string */
+          sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
+                                        local->tm_hour, local->tm_min, local->tm_sec, i, orientation_to_lead, distance_to_lead);
+          wb_camera_save_image(camera, filename, 100);
+
+            /* and set the string */
+//            sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/seg/%02d_%02d_%02d_%05d_seg_%.4f_%.4f.jpg",
+//                                        local->tm_hour, local->tm_min, local->tm_sec, i, orientation_to_lead, distance_to_lead);
+//    //      wb_camera_recognition_enable(camera, TIME_STEP);
+//    //      wb_camera_recognition_get_segmentation_image(camera);
+//            wb_camera_recognition_save_segmentation_image(camera, filename, 100);
+
+
         } else {
           wbu_driver_set_brake_intensity(0.5);
           PID_need_reset = true;
         }
 
-        time_t secs = time(0);
-
-        /* convert to localtime */
-        struct tm *local = localtime(&secs);
-        char filename[200];
-
-        /* and set the string */
-        sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
-                                    local->tm_hour, local->tm_min, local->tm_sec, i, orientation_to_lead, distance_to_lead);
-        wb_camera_save_image(camera, filename, 100);
-
-        /* and set the string */
-        sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/seg/%02d_%02d_%02d_%05d_seg_%.4f_%.4f.jpg",
-                                    local->tm_hour, local->tm_min, local->tm_sec, i, orientation_to_lead, distance_to_lead);
-//      wb_camera_recognition_enable(camera, TIME_STEP);
-//      wb_camera_recognition_get_segmentation_image(camera);
-        wb_camera_recognition_save_segmentation_image(camera, filename, 100);
 
       }
 
