@@ -615,7 +615,8 @@ DEF LEAD BmwX5New {
         }
       ]
       fieldOfView 1
-      width 128
+      width 224
+      height 224
       recognition Recognition {
         segmentation TRUE
       }
@@ -669,7 +670,8 @@ DEF FOLLOWER BmwX5New {
         }
       ]
       fieldOfView 1
-      width 128
+      width 224
+      height 224
       focus Focus {
         focalDistance 10
       }
