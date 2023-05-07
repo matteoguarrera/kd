@@ -2,6 +2,8 @@
 /example1/controllers/lead/build/
 /example2
 /screenshots
+/imgs
+/UNet-Multiclass
 *.png
 
 # Prerequisites
@@ -56,3 +58,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/UNet-Multiclass/
+/UNet-Multiclass/
