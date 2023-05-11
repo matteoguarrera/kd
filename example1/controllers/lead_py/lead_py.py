@@ -55,7 +55,9 @@ while lead.step() != -1:
         #         print('blind')
         avoid_obstacles_and_follow_yellow_line(obstacle_dist, obstacle_angle, yellow_line_angle)
 
-        compute_gps_speed()
+        gps_coords = gps.getValues()  # x, y, z
+        gps_speed = gps.getSpeed()
+        print(gps_coords[0], gps_coords[1], gps_speed)
 
 #
 # from utils import *
