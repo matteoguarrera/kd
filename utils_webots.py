@@ -17,39 +17,39 @@ from numpy import save, load
 from torch.utils.data import Dataset, DataLoader
 
 
-def create_dataset_file():
-    LOAD = True
+def create_dataset_file(load=True, filename='df_follower_labelled'):
 
     # Top level data directory.
     data_dir = "./imgs/follower/img/"
 
-    if not LOAD:
+    if not load:
         # /home/matteogu/Documents/kd/imgs/follower/img/
         lst_files = os.listdir(data_dir)
         print(len(lst_files))
 
         # Filter Data
-        data = np.zeros((len(lst_files), 3))
+        data = np.zeros((len(lst_files), 4))
         name = [None] * len(lst_files)
 
         labelled = 0
         for ii, file in enumerate(lst_files):
-            results = parse("{}_{}_{}_{}_{}_{}.jpg", file)
+            results = parse("{}_{}_{}_{}_{}_{}_{}.jpg", file)
             if results is None:
                 results = parse("{}_{}_{}_{}_{}.jpg", file)  # orientation_to_lead
                 idx, orientation_to_lead = results[-2:]
                 # print(file, orientation_to_lead)
             else:
-                idx, orientation_to_lead, distance_to_lead = results[-3:]
+                idx, orientation_to_lead, distance_to_lead, filtered_angle = results[-4:]
                 # print(file, orientation_to_lead, distance_to_lead)
-                data[labelled] = idx, orientation_to_lead, distance_to_lead
+                data[labelled] = idx, orientation_to_lead, distance_to_lead, filtered_angle
                 name[labelled] = file
                 labelled += 1
 
-        df = pd.DataFrame([name[:labelled], data[:labelled, 0], data[:labelled, 1], data[:labelled, 2]]).T
-        df.columns = ['filename', 'idx', 'orientation', 'distance']
+        df = pd.DataFrame([name[:labelled], data[:labelled, 0], data[:labelled, 1],
+                                            data[:labelled, 2], data[:labelled, 3]]).T
+
+        df.columns = ['filename', 'idx', 'orientation', 'distance', 'angle']
         df_follower_labelled = df[df['orientation'] != 99999.99]
-        # df_follower_labelled.to_csv('df_follower_labelled.csv')
         df_follower_labelled.reset_index(drop=True, inplace=True)
         # df_follower_labelled
         # Read Data
@@ -59,22 +59,26 @@ def create_dataset_file():
             dataset[i] = image
 
         # Save data to npy file
-        save('df_follower_labelled.npy', dataset)
+        save(f'{filename}.npy', dataset)
+        df_follower_labelled.to_csv(f'{filename}.csv')
+
     else:
-        dataset_loaded = load('df_follower_labelled.npy')
-        df_loaded = pd.read_csv('df_follower_labelled.csv')
+        dataset_loaded = load(f'{filename}.npy')
+        df_loaded = pd.read_csv(f'{filename}.csv')
+        return dataset_loaded, df_loaded
 
 
 class WeBotsDataset(Dataset):
-    def __init__(self, csv_file='df_follower_labelled.csv',
-                 root_dir='./imgs/follower/img/', train=True,
-                 transform=None):
+    def __init__(self, filename='df_follower_labelled2',
+                 # root_dir='./imgs/follower/img/',
+                 transform=None
+                 ):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.df_loaded = pd.read_csv(csv_file)
-        self.dataset_loaded = torch.Tensor(load('df_follower_labelled.npy')/255)  # .to(self.device) # to float
-
-        self.root_dir = root_dir
+        self.df_loaded = pd.read_csv(f'{filename}.csv')
+        dataset_loaded = load(f'{filename}.npy')/255.0  # .to(self.device) # to float
+        self.dataset_loaded = dataset_loaded.astype(np.float32)
+        # self.root_dir = root_dir
         self.transform = transform
 
     def __len__(self):
@@ -85,10 +89,12 @@ class WeBotsDataset(Dataset):
             idx = idx.tolist()
 
         image = self.dataset_loaded[idx]
-        target = torch.tensor(self.df_loaded.iloc[idx]['orientation'])  # .to(self.device)
+        orientation = torch.tensor(self.df_loaded.iloc[idx]['orientation']).float()  # .to(self.device)
+        angle = torch.tensor(self.df_loaded.iloc[idx]['angle']).float()  # .to(self.device)
+
         # sample = {'image': image, 'landmarks': landmarks}
 
-        # if self.transform:
-        #     sample = self.transform(image)
+        if self.transform:
+            image = self.transform(image)
 
-        return image, target
+        return image, (orientation, angle)

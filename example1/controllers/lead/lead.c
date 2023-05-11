@@ -312,7 +312,9 @@ double applyPID(double yellow_line_angle) {
     integral += yellow_line_angle;
 
   oldValue = yellow_line_angle;
-  return KP * yellow_line_angle + KI * integral + KD * diff;
+  double res = KP * yellow_line_angle + KI * integral + KD * diff;
+
+  return res;
 }
 
 int main(int argc, char **argv) {
@@ -395,7 +397,8 @@ int main(int argc, char **argv) {
         sick_data = wb_lidar_get_range_image(sick);
 
       if (autodrive && has_camera) {
-        double yellow_line_angle = filter_angle(process_camera_image(camera_image));
+        double angle_tmp = process_camera_image(camera_image);
+        double yellow_line_angle = filter_angle(angle_tmp);
         double obstacle_dist;
         double obstacle_angle;
         if (enable_collision_avoidance)
@@ -439,6 +442,7 @@ int main(int argc, char **argv) {
         } else {
           // no obstacle has been detected but we lost the line => we brake and hope to find the line again
           wbu_driver_set_brake_intensity(0.7);
+
           if (r < 0) {
             // srand(time(NULL));
             // r = rand() % 3;
@@ -451,6 +455,7 @@ int main(int argc, char **argv) {
               r = 2;
             }
           }
+
           if (r == 0) {
             set_steering_angle(applyPID(-0.5));
           } else if (r == 1) {
@@ -465,17 +470,33 @@ int main(int argc, char **argv) {
             // set_steering_angle(applyPID(steering_angle));
             // steering_angle *= 0.9;
           }
+
+
         }
         // Autodrive and camera, save images and data
         // wb_camera_save_image(WbDeviceTag tag, const char *filename, int quality)
 
         /* get seconds since the Epoch */
-//        time_t secs = time(0);
-//
-//        /* convert to localtime */
-//        struct tm *local = localtime(&secs);
-//        char filename[200];
-//
+        time_t secs = time(0);
+
+        /* convert to localtime */
+        struct tm *local = localtime(&secs);
+        char filename[200];
+        /* and set the string */
+        sprintf(filename, "/home/matteogu/Documents/kd/imgs/lead/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
+                                        local->tm_hour, local->tm_min, local->tm_sec, i,
+                                        angle_tmp, yellow_line_angle);
+        wb_camera_save_image(camera, filename, 100);
+
+        sprintf(filename, "/home/matteogu/Documents/kd/imgs/lead/seg/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
+                                        local->tm_hour, local->tm_min, local->tm_sec, i,
+                                        angle_tmp, yellow_line_angle);
+        wb_camera_recognition_enable(camera, TIME_STEP);
+        wb_camera_recognition_enable_segmentation(camera);
+//        wb_camera_recognition_get_segmentation_image(camera);
+        wb_camera_recognition_save_segmentation_image(camera, filename, 100);
+
+
 //        /* and set the string */
 //        sprintf(filename, "/home/matteogu/Documents/kd/imgs/lead/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
 //                                    local->tm_hour, local->tm_min, local->tm_sec, i, yellow_line_angle, obstacle_angle);

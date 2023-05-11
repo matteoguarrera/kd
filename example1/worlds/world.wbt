@@ -583,7 +583,7 @@ DEF LEAD BmwX5New {
   rotation -7.240001997507892e-05 0.00772119763954837 0.9999701884882609 0
   color 0.45098 0.823529 0.0862745
   name "lead"
-  controller "lead"
+  controller "lead_py"
   controllerArgs [
     ""
   ]
@@ -615,8 +615,7 @@ DEF LEAD BmwX5New {
         }
       ]
       fieldOfView 1
-      width 224
-      height 224
+      width 128
       recognition Recognition {
         segmentation TRUE
       }
@@ -670,8 +669,7 @@ DEF FOLLOWER BmwX5New {
         }
       ]
       fieldOfView 1
-      width 224
-      height 224
+      width 128
       focus Focus {
         focalDistance 10
       }

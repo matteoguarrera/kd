@@ -385,7 +385,8 @@ int main(int argc, char **argv) {
       if (autodrive && has_camera) {
         set_speed(SPEED);
         printf("[FOLLOWER]");
-        double orientation_to_lead = filter_angle(process_camera_image(camera_image));
+        double filtered_angle = process_camera_image(camera_image);
+        double orientation_to_lead = filter_angle(filtered_angle);
         if (orientation_to_lead != UNKNOWN) {
           if (distance_to_lead != UNKNOWN) {
             if (distance_to_lead > 12.5) {
@@ -404,8 +405,9 @@ int main(int argc, char **argv) {
           char filename[200];
 
             /* and set the string */
-          sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/img/%02d_%02d_%02d_%05d_%.4f_%.4f.jpg",
-                                        local->tm_hour, local->tm_min, local->tm_sec, i, orientation_to_lead, distance_to_lead);
+          sprintf(filename, "/home/matteogu/Documents/kd/imgs/follower/img/%02d_%02d_%02d_%05d_%.4f_%.4f_%.4f.jpg",
+                                        local->tm_hour, local->tm_min, local->tm_sec, i,
+                                        orientation_to_lead, distance_to_lead, filtered_angle);
           wb_camera_save_image(camera, filename, 100);
 
             /* and set the string */

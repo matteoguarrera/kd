@@ -4,6 +4,10 @@
 /screenshots
 /imgs
 /UNet-Multiclass
+*.scenic
+*.pth
+*.npy
+*.csv
 *.png
 
 # Prerequisites
