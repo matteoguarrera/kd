@@ -46,11 +46,11 @@ while lead.step() != -1:
             obstacle_angle = UNKNOWN
             obstacle_dist = 0
 
-        if _step_ %50 == 0:
-            if angle_tmp != 'unknown':
-                print(f'{angle_tmp:.4f} {yellow_line_angle:.4f}')
-            else:
-                print('blind')
+        # if _step_ %50 == 0:
+        #     if angle_tmp != 'unknown':
+        #         print(f'{angle_tmp:.4f} {yellow_line_angle:.4f}')
+        #     else:
+        #         print('blind')
         avoid_obstacles_and_follow_yellow_line(obstacle_dist, obstacle_angle, yellow_line_angle)
 
         compute_gps_speed()

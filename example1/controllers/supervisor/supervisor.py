@@ -25,12 +25,16 @@ except ModuleNotFoundError:
 TIME_STEP = 10
 
 supervisor = Supervisor()  # create Supervisor instance
-ego = supervisor.getFromDef('FOLLOWER')
+try:
+    ego = supervisor.getFromDef('FOLLOWER')
+    supervisor.getFromDef("FOLLOWER").restartController()
+except:
+    print('------- [Leader only world] -------')
+
 lead = supervisor.getFromDef('LEAD')
 # print(dir(ego))
 supervisor.simulationResetPhysics()
 supervisor.simulationReset()
-supervisor.getFromDef("FOLLOWER").restartController()
 supervisor.getFromDef("LEAD").restartController()
 supervisor.step(TIME_STEP)
 
@@ -41,9 +45,9 @@ while supervisor.step(TIME_STEP) != -1:
     #     print(ego.getPosition())
     i += 1
     # print(i)
-    if i > 10000:
-        supervisor.simulationReset()
-        # supervisor.simulationQuit(0) # or EXIT_FAILURE)
-        break
+    # if i > 10000:
+    #     supervisor.simulationReset()
+    #     # supervisor.simulationQuit(0) # or EXIT_FAILURE)
+    #     break
 
 print("[SUPERVISOR] Ended successfully")

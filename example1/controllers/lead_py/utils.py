@@ -185,9 +185,9 @@ def applyPID(yellow_line_angle):
 
     oldValue = yellow_line_angle
     res = KP * yellow_line_angle + KI * integral + KD * diff
-    file = open('py_res.csv', 'a')
-    file.write(f'{res}, ')
-    file.close()
+    # file = open('py_res.csv', 'a')
+    # file.write(f'{res}, ')
+    # file.close()
 
     return res
 
@@ -288,7 +288,7 @@ def avoid_obstacles_and_follow_yellow_line(obstacle_dist, obstacle_angle, yellow
                 r += 1
             # set_steering_angle(applyPID(steering_angle))
             # steering_angle *= 0.9
-        print(r)
+        # print(r)
 
 
 
