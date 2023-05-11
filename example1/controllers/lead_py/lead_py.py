@@ -2,11 +2,6 @@
 Description: Autonomous vehicle controller example
 """
 
-import sys
-import os
-# print(os.listdir('../../../segment'))
-sys.path.append('../../..')
-from segment.model import UNET
 
 from utils import *
 import torch
@@ -19,39 +14,6 @@ def wprint(*args):
 # print(supervisor.getNumberOfDevices())
 # # print(dir(robot))  # methods of supervisor
 lst_fn = dir(lead)
-
-
-def load_nn():
-    teacher = UNET(layers=[3, 64, 128], classes=10).to('cpu')  # [3, 64, 128] # 256, 512, 1024
-    TEACHER_PATH = '../../../segment/v0.97_teacher_l3_64_128_e10_lr5e-05_d05_07_23_04_02'
-    checkpoint = torch.load(TEACHER_PATH, map_location=torch.device('cpu'))
-    teacher.load_state_dict(checkpoint['model_state_dict'])
-    return teacher
-
-
-def process_camera_image_nn(image_array):
-    # image processing to adapt to how the model was trained
-    img = torch.tensor(image_array)
-    img = torch.reshape(img, shape=(64, 128, 3))
-    img = img.permute(2, 1, 0)
-    img = img.unsqueeze(0).float()  # input is float 0. 255.
-
-    pred = model(img)  #
-    preds_class = torch.argmax(pred, dim=1)  # input [1, 10, 128, 64], output [1, 128, 64]) torch.int64
-    pred_line = (9 == preds_class.int()).numpy()[0]  # remove redundant dimension
-    # print(pred_line)
-    # need to compare the output with the pixel
-    pixelwise_corr = np.sum(pred_line)  # count yellow (?)
-
-    x_pos, y_pos = np.where(pred_line)
-    # x_pos, y_pos,
-    # if no pixels was detected...
-    if pixelwise_corr <= 10:
-        return 'unknown', None, None
-
-    angle_nn = (sum(x_pos) / pixelwise_corr / camera_width - 0.5) * camera_fov
-    return angle_nn, sumx, pixel_count
-
 
 model = load_nn()
 
@@ -73,7 +35,7 @@ while lead.step() != -1:
         sick_data = sick.getRangeImage()  # 180
 
         angle_tmp, sumx, pixel_count = process_camera_image(camera_image)
-        angle_nn, sumx_nn, pixel_count_nn = process_camera_image(camera_image)
+        angle_nn, sumx_nn, pixel_count_nn = process_camera_image_nn(model, camera_image_array)
 
         yellow_line_angle = filter_angle(angle_nn)
         # yellow_line_angle = filter_angle(angle_tmp)
