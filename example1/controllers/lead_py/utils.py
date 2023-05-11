@@ -115,9 +115,9 @@ def process_camera_image(image):
 
     # if no pixels was detected...
     if pixel_count == 0:
-        return 'unknown'
+        return 'unknown', None, None
 
-    return (sumx / pixel_count / camera_width - 0.5) * camera_fov
+    return (sumx / pixel_count / camera_width - 0.5) * camera_fov, sumx, pixel_count
 
 
 # filter angle of the yellow line (simple average)
