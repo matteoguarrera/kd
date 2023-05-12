@@ -3,7 +3,7 @@ Description: Autonomous vehicle controller example
 """
 
 
-from utils_lead import *
+from utils_follower import *
 import torch
 
 
@@ -52,7 +52,7 @@ while lead.step() != -1:
             obstacle_angle = UNKNOWN
             obstacle_dist = 0
 
-        if _step_ % 1000 == 0:
+        if _step_ % 1 == 0:
             # if angle_tmp != 'unknown':
             if yellow_line_angle != 'unknown':
                 print(f'YL {yellow_line_angle:.4f}') # {angle_tmp:.4f}

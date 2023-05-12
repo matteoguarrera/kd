@@ -103,12 +103,19 @@ def __color_diff__(a, b):
     return diff
 
 
-def load_nn():
-    teacher = UNET(layers=[3, 64, 128], classes=10).to('cpu')  # [3, 64, 128] # 256, 512, 1024
-    TEACHER_PATH = '../../../segment/v0.97_teacher_l3_64_128_e10_lr5e-05_d05_07_23_04_02'
-    checkpoint = torch.load(TEACHER_PATH, map_location=torch.device('cpu'))
-    teacher.load_state_dict(checkpoint['model_state_dict'])
-    return teacher
+def load_nn(arch='teacher'):
+    if arch == 'student':
+        model = UNET(layers=[3, 64], classes=10).to('cpu')  # [3, 64, 128] # 256, 512, 1024
+        PATH = '../../../segment/v0.91_student_l3_64_e20_lr5e-05_d05_07_23_38_10'
+    elif arch == 'teacher':
+        model = UNET(layers=[3, 64, 128], classes=10).to('cpu')  # [3, 64, 128] # 256, 512, 1024
+        PATH = '../../../segment/v0.97_teacher_l3_64_128_e10_lr5e-05_d05_07_23_04_02'
+    else:
+        raise NotImplementedError
+
+    checkpoint = torch.load(PATH, map_location=torch.device('cpu'))
+    model.load_state_dict(checkpoint['model_state_dict'])
+    return model
 
 
 def process_camera_image_nn(model, image_array):
@@ -302,29 +309,33 @@ def avoid_obstacles_and_follow_yellow_line(obstacle_dist, obstacle_angle, yellow
     else:
         # no obstacle has been detected but we lost the line => we brake and hope to find the line again
         lead.setBrakeIntensity(0.7)
-        if r < 0:
-            # r = random.randint(0, 2)
-            # if argv[1] == "L":
-            #     r = 0
-            # elif argv[1] == "R":
-            #     r = 1
-            # elif argv[1] == "S":
-            #     r = 2
-            r = r
+        # -- -- -- -- New stragegy, just keep straight
+        set_steering_angle(applyPID(0.0))
+        print('break and not steer')
 
-        if r == 0:
-            set_steering_angle(applyPID(-0.5))
-        elif r == 1:
-            set_steering_angle(applyPID(0.5))
-        else:
-            lead.setBrakeIntensity(1.0)
-            if r > 10:
-                set_steering_angle(applyPID(0.0))
-            else:
-                r += 1
-            # set_steering_angle(applyPID(steering_angle))
-            # steering_angle *= 0.9
-        # print(r)
+        # if r < 0:
+        #     # r = random.randint(0, 2)
+        #     # if argv[1] == "L":
+        #     #     r = 0
+        #     # elif argv[1] == "R":
+        #     #     r = 1
+        #     # elif argv[1] == "S":
+        #     #     r = 2
+        #     r = r
+        #
+        # if r == 0:
+        #     set_steering_angle(applyPID(-0.5))
+        # elif r == 1:
+        #     set_steering_angle(applyPID(0.5))
+        # else:
+        #     lead.setBrakeIntensity(1.0)
+        #     if r > 10:
+        #         set_steering_angle(applyPID(0.0))
+        #     else:
+        #         r += 1
+        #     # set_steering_angle(applyPID(steering_angle))
+        #     # steering_angle *= 0.9
+        # # print(r)
 
 
 
